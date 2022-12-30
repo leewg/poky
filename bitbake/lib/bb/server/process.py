@@ -382,6 +382,7 @@ class ProcessServer():
                 del self._idlefuns[function]
                 self.idle_cond.notify_all()
 
+        lastdebug = time.time()
         while not self.quit:
             nextsleep = 0.1
             fds = []
@@ -420,6 +421,12 @@ class ProcessServer():
                     remove_idle_func(function)
                     serverlog("Exception %s broke the idle_thread, exiting" % traceback.format_exc())
                     self.quit = True
+
+            if time.time() > (lastdebug + 60):
+                lastdebug = time.time()
+                with self._idlefuncsLock:
+                    num_funcs = len(self._idlefuns)
+                serverlog("Current command %s, idle functions %s, last exit event %s" % (self.cooker.command.currentAsyncCommand, num_funcs, self.cooker.command.lastEvent))
 
             if nextsleep is not None:
                 select.select(fds,[],[],nextsleep)[0]

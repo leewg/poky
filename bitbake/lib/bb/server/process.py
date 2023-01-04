@@ -425,7 +425,7 @@ class ProcessServer():
 
             if time.time() > (lastdebug + 60):
                 lastdebug = time.time()
-                with self._idlefuncsLock:
+                with bb.utils.lock_timeout(self._idlefuncsLock):
                     num_funcs = len(self._idlefuns)
                 serverlog("Current command %s, idle functions %s, last exit event %s, state %s" % (self.cooker.command.currentAsyncCommand, num_funcs, self.cooker.command.lastEvent, self.cooker.state))
 
